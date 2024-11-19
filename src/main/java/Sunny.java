@@ -11,7 +11,6 @@ public class Sunny {
         System.out.println("____________________________________________________________________________________________________________________________");
     }
 
-
     // prints messages with separators to allow cleaner code
     private static void printMessage(String... messages) {
         printSeparator();
@@ -21,6 +20,11 @@ public class Sunny {
         printSeparator();
     }
 
+    public enum TaskType {
+        TODO,
+        DEADLINE,
+        EVENT;
+    }
 
     public static void main(String[] args) {
         // display welcome message
@@ -95,19 +99,26 @@ public class Sunny {
         String[] taskParts = input.split(" ", 2);
         // convert part 1 of the input into task type (all lowercase for consistency)
         String task = taskParts[0].toLowerCase();
-        switch (task) {
+
+        try {
+            TaskType taskType = TaskType.valueOf(task.toUpperCase()); // Convert string to enum
+
             // determine the type of task to add
-            case "todo":
-                addTodoTask(taskParts); // call method to add to do task
-                break;
-            case "deadline":
-                addDeadlineTask(taskParts); // call method to add a deadline task
-                break;
-            case "event":
-                addEventTask(taskParts); // call method to add an event task
-                break;
-            default:
-                printMessage(" Error, Please try again. Please provide a valid task type (e.g. todo, deadline, or event)");
+            switch (taskType) {
+                case TODO:
+                    addTodoTask(taskParts); // call method to add to do task
+                    break;
+                case DEADLINE:
+                    addDeadlineTask(taskParts); // call method to add a deadline task
+                    break;
+                case EVENT:
+                    addEventTask(taskParts); // call method to add an event task
+                    break;
+                default:
+                    printMessage(" Error, Please try again. Please provide a valid task type (e.g. todo, deadline, or event)");
+            }
+        } catch (IllegalArgumentException e) {
+            printMessage(" Error, Please try again. Please provide a valid task type (e.g. todo, deadline, or event).");
         }
     }
 
