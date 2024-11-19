@@ -1,11 +1,10 @@
 import java.util.Scanner;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class Sunny {
-    private static final int maxTask = 100;
-    private static final Task[] tasks = new Task[maxTask];
-    private static int taskCount = 0;
-
+    private static final int MAX_TASKS = 100;
+    private static final List<Task> tasks = new ArrayList<>();
 
     // prints a separator line
     private static void printSeparator() {
@@ -47,7 +46,6 @@ public class Sunny {
         while (true) {
             input = in.nextLine();
 
-
             // end session if user inputs "bye"
             if (input.equalsIgnoreCase("bye")) {
                 printMessage(" Bye. Hope to see you again soon!");
@@ -61,7 +59,11 @@ public class Sunny {
             } else if (input.startsWith("unmark")) {
                 // mark task as not done when user input starts with "unmark" (e.g. unmark 2)
                 unmarkTask(input);
-            } else {
+            } else if (input.startsWith("delete")) {
+                // delete task when user input starts with "delete" (e.g. delete 2)
+                deleteTask(input);
+            }
+            else {
                 addTask(input);
             }
         }
@@ -69,12 +71,13 @@ public class Sunny {
         in.close();
     }
 
+
     // method to display all task
     private static void listTasks() {
         StringBuilder taskList = new StringBuilder();
         taskList.append("Here are the tasks in your list:\n");
-        for (int i = 0; i < taskCount; i++) {
-            taskList.append(" ").append(i + 1).append(". ").append(tasks[i]).append("\n");
+        for (int i = 0; i < tasks.size(); i++) {
+            taskList.append(" ").append(i + 1).append(". ").append(tasks.get(i)).append("\n");
         }
         printMessage(taskList.toString());
     }
@@ -82,29 +85,29 @@ public class Sunny {
 
     // method to add a new task based on user input
     private static void addTask(String input) {
+        // check if the task list has reached its limit
+        if (tasks.size() >= MAX_TASKS) {
+            printMessage(" Error, Please try again. There are too many tasks for Sunny to handle! Maximum is " + MAX_TASKS + " tasks.");
+            return;
+        }
+
         // split the input into maximum two parts: command and description
         String[] taskParts = input.split(" ", 2);
         // convert part 1 of the input into task type (all lowercase for consistency)
         String task = taskParts[0].toLowerCase();
-        // check if there is space for more tasks (max 100)
-        if (taskCount < maxTask) {
-            switch (task) {
-                // determine the type of task to add
-                case "todo":
-                    addTodoTask(taskParts); // call method to add to do task
-                    break;
-                case "deadline":
-                    addDeadlineTask(taskParts); // call method to add a deadline task
-                    break;
-                case "event":
-                    addEventTask(taskParts); // call method to add an event task
-                    break;
-                default:
-                    printMessage(" Error, Please try again. Please provide a valid task type (e.g. todo, deadline, or event)");
-            }
-        } else {
-            // notify user if the maximum number of tasks has been reached
-            printMessage(" Error, Please try again. There are too many tasks for Sunny to handle! Maximum is " + maxTask + " tasks.");
+        switch (task) {
+            // determine the type of task to add
+            case "todo":
+                addTodoTask(taskParts); // call method to add to do task
+                break;
+            case "deadline":
+                addDeadlineTask(taskParts); // call method to add a deadline task
+                break;
+            case "event":
+                addEventTask(taskParts); // call method to add an event task
+                break;
+            default:
+                printMessage(" Error, Please try again. Please provide a valid task type (e.g. todo, deadline, or event)");
         }
     }
 
@@ -117,8 +120,8 @@ public class Sunny {
             return; // exit the method if no description is provided
         }
         // create a new to do task with the provided description and add it to the tasks array
-        tasks[taskCount++] = new Todo(taskParts[1]);
-        printMessage(" added: " + tasks[taskCount - 1]);
+        tasks.add(new Todo(taskParts[1]));
+        printMessage(" added: " + tasks.get(tasks.size() - 1));
     }
 
 
@@ -140,8 +143,8 @@ public class Sunny {
 
 
         // create a new Deadline task with the description and due date, and add it to the tasks array
-        tasks[taskCount++] = new Deadline(deadlineParts[0].trim(), deadlineParts[1].trim());
-        printMessage(" added: " + tasks[taskCount - 1]);
+        tasks.add(new Deadline(deadlineParts[0].trim(), deadlineParts[1].trim()));
+        printMessage(" added: " + tasks.get(tasks.size() - 1));
     }
 
 
@@ -187,8 +190,8 @@ public class Sunny {
 
 
         // create a new Event task with the description, start time, and end time, and add it to the tasks array
-        tasks[taskCount++] = new Event(eventParts[0].trim(), eventParts[1].trim(), eventParts[2].trim());
-        printMessage("added: " + tasks[taskCount - 1]);
+        tasks.add(new Event(eventParts[0].trim(), eventParts[1].trim(), eventParts[2].trim()));
+        printMessage("added: " + tasks.get(tasks.size() - 1));
     }
 
 
@@ -204,17 +207,17 @@ public class Sunny {
         try {
             int taskNumber = Integer.parseInt(parts[1]) - 1;
             // validate if the task number is within the bounds of the task list
-            if (taskNumber < 0 || taskNumber >= taskCount) {
+            if (taskNumber < 0 || taskNumber >= tasks.size()) {
                 printMessage(" Error, Please try again. Please provide a valid task number within the task list.");
                 return;
             }
             // check if the specified task is already marked as done
-            if (tasks[taskNumber].isDone) {
+            if (tasks.get(taskNumber).isDone) {
                 printMessage(" Task " + (taskNumber + 1) + " is already marked as done!");
             } else {
                 // mark task as done
-                tasks[taskNumber].markAsDone();
-                printMessage("Nice! I've marked this task as done:\n    " + tasks[taskNumber]);
+                tasks.get(taskNumber).markAsDone();
+                printMessage("Nice! I've marked this task as done:\n    " + tasks.get(taskNumber));
             }
         } catch (NumberFormatException e) {
             // handle the case where the task number is not a valid integer
@@ -238,21 +241,47 @@ public class Sunny {
         try {
             int taskNumber = Integer.parseInt(partsU[1]) - 1;
             // validate if the task number is within the bounds of the task list
-            if (taskNumber < 0 || taskNumber >= taskCount) {
+            if (taskNumber < 0 || taskNumber >= tasks.size()) {
                 printMessage(" Error, Please try again. Please provide a valid task number within the task list.");
                 return;
             }
             // check if the specified task is already marked as not done
-            if (!tasks[taskNumber].isDone) {
+            if (!tasks.get(taskNumber).isDone) {
                 printMessage(" Task " + (taskNumber + 1) + " is already marked as not done!");
             } else {
                 // mark task as not done
-                tasks[taskNumber].markAsNotDone();
-                printMessage(" Nice! I've marked this task as not done:\n    " + tasks[taskNumber]);
+                tasks.get(taskNumber).markAsNotDone();
+                printMessage(" Nice! I've marked this task as not done:\n    " + tasks.get(taskNumber));
             }
         } catch (NumberFormatException e) {
             // handle the case where the task number is not a valid integer
             printMessage(" Error, Please try again. Please provide a valid numeric task number.");
         }
     }
+
+    private static void deleteTask(String input) {
+        String[] parts = input.split(" ");
+        // validate the input format
+        if (parts.length < 2) {
+            printMessage(" Error, Please try again. Please provide a task number to delete (e.g. delete <number>).");
+            return;
+        }
+
+        try {
+            int taskNumber = Integer.parseInt(parts[1]) - 1; // Convert input to zero-based index
+            // validate the task number is within bounds
+            if (taskNumber < 0 || taskNumber >= tasks.size()) {
+                printMessage(" Error, Please try again. Please provide a valid task number within the task list.");
+                return;
+            }
+
+            // remove the task from the list and display the removed task
+            Task removedTask = tasks.remove(taskNumber);
+            printMessage("Noted. I've removed this task:", "  " + removedTask,
+                    "Now you have " + tasks.size() + " tasks in the list.");
+        } catch (NumberFormatException e) {
+            printMessage(" Error, Please try again. Please provide a valid numeric task number.");
+        }
+    }
 }
+
