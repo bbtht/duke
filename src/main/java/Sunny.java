@@ -1,14 +1,17 @@
 import java.util.Scanner;
 
+
 public class Sunny {
     private static final int maxTask = 100;
     private static final Task[] tasks = new Task[maxTask];
     private static int taskCount = 0;
 
+
     // prints a separator line
     private static void printSeparator() {
-        System.out.println("____________________________________________________________");
+        System.out.println("____________________________________________________________________________________________________________________________");
     }
+
 
     // prints messages with separators to allow cleaner code
     private static void printMessage(String... messages) {
@@ -18,6 +21,7 @@ public class Sunny {
         }
         printSeparator();
     }
+
 
     public static void main(String[] args) {
         // display welcome message
@@ -33,13 +37,16 @@ public class Sunny {
                 "[bye]: end the session";
         printMessage(welcomeMessage);
 
+
         // scanner for user input
         Scanner in = new Scanner(System.in);
         String input;
 
+
         // loop to process user input
         while (true) {
             input = in.nextLine();
+
 
             // end session if user inputs "bye"
             if (input.equalsIgnoreCase("bye")) {
@@ -72,6 +79,7 @@ public class Sunny {
         printMessage(taskList.toString());
     }
 
+
     // method to add a new task based on user input
     private static void addTask(String input) {
         // split the input into maximum two parts: command and description
@@ -92,19 +100,20 @@ public class Sunny {
                     addEventTask(taskParts); // call method to add an event task
                     break;
                 default:
-                    printMessage(" Unknown task type. Use todo, deadline, or event.");
+                    printMessage(" Error, Please try again. Please provide a valid task type (e.g. todo, deadline, or event)");
             }
         } else {
             // notify user if the maximum number of tasks has been reached
-            printMessage(" Sorry, too many tasks for Sunny to handle! There are " + maxTask + " tasks.");
+            printMessage(" Error, Please try again. There are too many tasks for Sunny to handle! Maximum is " + maxTask + " tasks.");
         }
     }
+
 
     // method to add to do task
     private static void addTodoTask(String[] taskParts) {
         // check if user provided description for the task
-        if (taskParts.length < 2) {
-            printMessage(" Please provide a description for the todo task.");
+        if (taskParts.length < 2 || taskParts[1].trim().isEmpty()) {
+            printMessage(" Error, Please try again. The description of a todo task cannot be empty.");
             return; // exit the method if no description is provided
         }
         // create a new to do task with the provided description and add it to the tasks array
@@ -112,92 +121,138 @@ public class Sunny {
         printMessage(" added: " + tasks[taskCount - 1]);
     }
 
+
     // method to add a deadline task
     private static void addDeadlineTask(String[] taskParts) {
         // check if the user provided a description and a due date
-        if (taskParts.length < 2 || !taskParts[1].contains("/by")) {
-            printMessage(" Please provide a description and a due date (e.g. /by Monday).");
+        if (taskParts.length < 2 || taskParts[1].trim().isEmpty()) {
+            printMessage(" Error, Please try again. The description of a deadline task cannot be empty.");
             return;
         }
+
+
         // split the description and due date using "/by" as the delimiter
         String[] deadlineParts = taskParts[1].split("/by", 2);
+        if (deadlineParts.length < 2 || deadlineParts[1].trim().isEmpty()) {
+            printMessage(" Error, Please try again. Please provide a due date (e.g. /by Monday).");
+            return;
+        }
+
+
         // create a new Deadline task with the description and due date, and add it to the tasks array
         tasks[taskCount++] = new Deadline(deadlineParts[0].trim(), deadlineParts[1].trim());
         printMessage(" added: " + tasks[taskCount - 1]);
     }
 
+
     // method to add an event task
     private static void addEventTask(String[] taskParts) {
-        // check if the user provided a description and both start and end time of the event
-        if (taskParts.length < 2 || !taskParts[1].contains("/from") || !taskParts[1].contains("/to")) {
-            printMessage(" Please provide a description and the time range (e.g. /from Mon 2pm /to 4pm).");
+        // check if the user provided a description
+        if (taskParts.length < 2 || taskParts[1].trim().isEmpty()) {
+            printMessage(" Error, Please try again. The description of an event task cannot be empty.");
             return;
         }
+
+
+        String input = taskParts[1].trim();
+
+
+        // check for the presence of both /from and /to
+        if (!input.contains("/from") || !input.contains("/to")) {
+            printMessage(" Error, Please try again. Please provide the start time and end time of the event (e.g. /from Mon 2pm /to 4pm).");
+            return;
+        }
+
+
+        // validate the order of /from and /to
+        int fromIndex = input.indexOf("/from");
+        int toIndex = input.indexOf("/to");
+
+
+        if (fromIndex > toIndex) {
+            printMessage(" Error, Please try again. The /from time must come before the /to time.");
+            return;
+        }
+
+
         // split the description into parts using "/from" and "/to" as delimiters
-        String[] eventParts = taskParts[1].split("/from|/to", 3);
+        String[] eventParts = input.split("/from|/to", 3);
+
+
+        // check if the split produced the expected number of parts
+        if (eventParts.length < 3 || eventParts[1].trim().isEmpty() || eventParts[2].trim().isEmpty()) {
+            printMessage(" Error, Please try again. Please provide the end time of the event (e.g. /to 4pm).");
+            return;
+        }
+
+
         // create a new Event task with the description, start time, and end time, and add it to the tasks array
         tasks[taskCount++] = new Event(eventParts[0].trim(), eventParts[1].trim(), eventParts[2].trim());
-        printMessage(" added: " + tasks[taskCount - 1]);
+        printMessage("added: " + tasks[taskCount - 1]);
     }
+
 
     // method to mark specified task as done
     private static void markTask(String input) {
         // split the input into command and task number
         String[] parts = input.split(" ");
         // check if input has 2 parts (command and task number)
-        if (parts.length == 2) {
-            try {
-                int taskNumber = Integer.parseInt(parts[1]) - 1;
-                // validate if taskNumber is within task list
-                if (taskNumber >= 0 && taskNumber < taskCount) {
-                    // check if task is already marked as done
-                    if (tasks[taskNumber].isDone) {
-                        printMessage(" Task " + (taskNumber + 1) + " is already marked as done!");
-                    } else {
-                        // mark task as done
-                        tasks[taskNumber].markAsDone();
-                        printMessage("Nice! I've marked this task as done:\n    " + tasks[taskNumber]);
-                    }
-                } else {
-                    // if taskNumber is out of bound, print invalid task number
-                    printMessage(" Invalid task number, please try again! (eg. mark 2)");
-                }
-            } catch (NumberFormatException e) {
-                // catch if task number is not a valid integer
-                printMessage(" Please provide a valid numeric task number.");
+        if (parts.length < 2) {
+            printMessage(" Error, Please try again. Please provide a task number to mark as done (e.g. mark <number>).");
+            return;
+        }
+        try {
+            int taskNumber = Integer.parseInt(parts[1]) - 1;
+            // validate if the task number is within the bounds of the task list
+            if (taskNumber < 0 || taskNumber >= taskCount) {
+                printMessage(" Error, Please try again. Please provide a valid task number within the task list.");
+                return;
             }
-        } else {
-            // if input format is incorrect (eg. no number provided)
-            printMessage(" Invalid input format. Use: mark <number>");
+            // check if the specified task is already marked as done
+            if (tasks[taskNumber].isDone) {
+                printMessage(" Task " + (taskNumber + 1) + " is already marked as done!");
+            } else {
+                // mark task as done
+                tasks[taskNumber].markAsDone();
+                printMessage("Nice! I've marked this task as done:\n    " + tasks[taskNumber]);
+            }
+        } catch (NumberFormatException e) {
+            // handle the case where the task number is not a valid integer
+            printMessage(" Error, Please try again. Please provide a valid numeric task number.");
         }
     }
+
 
     // method to mark specified task as not done
     private static void unmarkTask(String input) {
         String[] partsU = input.split(" ");
-        // check if input has 2 parts (command and task number)
-        if (partsU.length == 2) {
-            try {
-                int taskNumber = Integer.parseInt(partsU[1]) - 1;
-                // validate if taskNumber is within task list
-                if (taskNumber >= 0 && taskNumber < taskCount) {
-                    // check if task is already marked as done
-                    if (!tasks[taskNumber].isDone) {
-                        printMessage(" Task " + (taskNumber + 1) + " is already marked as not done!");
-                    } else {
-                        tasks[taskNumber].markAsNotDone();
-                        printMessage(" Nice! I've marked this task as not done:\n    " + tasks[taskNumber]);
-                    }
-                } else {
-                    printMessage(" Invalid task number, please try again! (eg. unmark 2)");
-                }
-            } catch (NumberFormatException e) {
-                // catch if task number is not a valid integer
-                printMessage(" Please provide a valid numeric task number.");
+
+
+        // check if the input has less than 2 parts or if the task number is empty
+        if (partsU.length < 2) {
+            printMessage(" Error, Please try again. Please provide a task number to unmark as done (e.g. unmark <number>).");
+            return;
+        }
+
+
+        try {
+            int taskNumber = Integer.parseInt(partsU[1]) - 1;
+            // validate if the task number is within the bounds of the task list
+            if (taskNumber < 0 || taskNumber >= taskCount) {
+                printMessage(" Error, Please try again. Please provide a valid task number within the task list.");
+                return;
             }
-        } else {
-            // if input format is incorrect (eg. no number provided)
-            printMessage(" Invalid input format. Use: unmark <number>");
+            // check if the specified task is already marked as not done
+            if (!tasks[taskNumber].isDone) {
+                printMessage(" Task " + (taskNumber + 1) + " is already marked as not done!");
+            } else {
+                // mark task as not done
+                tasks[taskNumber].markAsNotDone();
+                printMessage(" Nice! I've marked this task as not done:\n    " + tasks[taskNumber]);
+            }
+        } catch (NumberFormatException e) {
+            // handle the case where the task number is not a valid integer
+            printMessage(" Error, Please try again. Please provide a valid numeric task number.");
         }
     }
 }
