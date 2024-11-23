@@ -1,17 +1,21 @@
+import tasklist.*;
+import storage.Storage;
+
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Sunny {
     private static final int MAX_TASKS = 100;
-    private static final List<Task> tasks = new ArrayList<>();
+    private static final ArrayList<Task> tasks = new ArrayList<>();
+    private static final Storage storage = new Storage("data/sunny.txt");
 
-    // prints a separator line
+    // printing a print separator to ease the hassle of typing the border for each message
     private static void printSeparator() {
         System.out.println("____________________________________________________________________________________________________________________________");
     }
 
-    // prints messages with separators to allow cleaner code
+    // prints messages with separators to allow easier print function
     private static void printMessage(String... messages) {
         printSeparator();
         for (String message : messages) {
@@ -27,6 +31,14 @@ public class Sunny {
     }
 
     public static void main(String[] args) {
+        // load task from storage
+        try {
+            tasks.addAll(storage.loadTasks());
+            printMessage("Tasks successfully loaded from storage!");
+        } catch (Exception e) {
+            printMessage("Error loading tasks from storage: " + e.getMessage(), "Starting with an empty task list.");
+        }
+
         // display welcome message
         String welcomeMessage = "Hello! I'm Sunny\n" +
                 "What can I do for you?\n" +
@@ -40,11 +52,9 @@ public class Sunny {
                 "[bye]: end the session";
         printMessage(welcomeMessage);
 
-
         // scanner for user input
         Scanner in = new Scanner(System.in);
         String input;
-
 
         // loop to process user input
         while (true) {
@@ -74,7 +84,6 @@ public class Sunny {
         // end scanner session
         in.close();
     }
-
 
     // method to display all task
     private static void listTasks() {
@@ -122,6 +131,13 @@ public class Sunny {
         }
     }
 
+    private static void saveTasks() {
+        try {
+            storage.save("data/sunny.txt", tasks);
+        } catch (Exception e) {
+            printMessage("Error saving tasks to file: " + e.getMessage());
+        }
+    }
 
     // method to add to do task
     private static void addTodoTask(String[] taskParts) {
@@ -133,6 +149,7 @@ public class Sunny {
         // create a new to do task with the provided description and add it to the tasks array
         tasks.add(new Todo(taskParts[1]));
         printMessage(" added: " + tasks.get(tasks.size() - 1));
+        saveTasks();
     }
 
 
@@ -156,6 +173,7 @@ public class Sunny {
         // create a new Deadline task with the description and due date, and add it to the tasks array
         tasks.add(new Deadline(deadlineParts[0].trim(), deadlineParts[1].trim()));
         printMessage(" added: " + tasks.get(tasks.size() - 1));
+        saveTasks();
     }
 
 
@@ -167,9 +185,7 @@ public class Sunny {
             return;
         }
 
-
         String input = taskParts[1].trim();
-
 
         // check for the presence of both /from and /to
         if (!input.contains("/from") || !input.contains("/to")) {
@@ -177,21 +193,17 @@ public class Sunny {
             return;
         }
 
-
         // validate the order of /from and /to
         int fromIndex = input.indexOf("/from");
         int toIndex = input.indexOf("/to");
-
 
         if (fromIndex > toIndex) {
             printMessage(" Error, Please try again. The /from time must come before the /to time.");
             return;
         }
 
-
         // split the description into parts using "/from" and "/to" as delimiters
         String[] eventParts = input.split("/from|/to", 3);
-
 
         // check if the split produced the expected number of parts
         if (eventParts.length < 3 || eventParts[1].trim().isEmpty() || eventParts[2].trim().isEmpty()) {
@@ -199,10 +211,10 @@ public class Sunny {
             return;
         }
 
-
         // create a new Event task with the description, start time, and end time, and add it to the tasks array
         tasks.add(new Event(eventParts[0].trim(), eventParts[1].trim(), eventParts[2].trim()));
         printMessage("added: " + tasks.get(tasks.size() - 1));
+        saveTasks();
     }
 
 
@@ -229,6 +241,7 @@ public class Sunny {
                 // mark task as done
                 tasks.get(taskNumber).markAsDone();
                 printMessage("Nice! I've marked this task as done:\n    " + tasks.get(taskNumber));
+                saveTasks();
             }
         } catch (NumberFormatException e) {
             // handle the case where the task number is not a valid integer
@@ -241,13 +254,11 @@ public class Sunny {
     private static void unmarkTask(String input) {
         String[] partsU = input.split(" ");
 
-
         // check if the input has less than 2 parts or if the task number is empty
         if (partsU.length < 2) {
             printMessage(" Error, Please try again. Please provide a task number to unmark as done (e.g. unmark <number>).");
             return;
         }
-
 
         try {
             int taskNumber = Integer.parseInt(partsU[1]) - 1;
@@ -263,6 +274,7 @@ public class Sunny {
                 // mark task as not done
                 tasks.get(taskNumber).markAsNotDone();
                 printMessage(" Nice! I've marked this task as not done:\n    " + tasks.get(taskNumber));
+                saveTasks();
             }
         } catch (NumberFormatException e) {
             // handle the case where the task number is not a valid integer
@@ -290,6 +302,7 @@ public class Sunny {
             Task removedTask = tasks.remove(taskNumber);
             printMessage("Noted. I've removed this task:", "  " + removedTask,
                     "Now you have " + tasks.size() + " tasks in the list.");
+            saveTasks();
         } catch (NumberFormatException e) {
             printMessage(" Error, Please try again. Please provide a valid numeric task number.");
         }
