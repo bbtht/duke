@@ -6,12 +6,18 @@ public class Todo extends Task {
     }
 
     @Override
-    public String toString() {
-        return "[T][" + (isDone ? "X" : " ") + "] " + description;
+    public String getType() {
+        return "T";  // Type for Todo task
     }
 
     @Override
-    protected String getType() {
-        return "T";
+    public String getDetails() {
+        return "";  // No extra details for a basic Todo task
+    }
+
+    @Override
+    public String getTaskStorageString() {
+        String doneMark = isDone() ? "X" : " ";
+        return String.format("[T][%s] %s", doneMark, description);
     }
 }

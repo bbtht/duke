@@ -9,16 +9,22 @@ public class Deadline extends Task {
     }
 
     public String getDeadlineDate() {
-        return deadlineDate;
+        return this.deadlineDate;
     }
 
     @Override
-    public String toString() {
-        return "[D][" + (isDone ? "X" : " ") + "] " + description + " (by: " + deadlineDate + ")";
+    public String getType() {
+        return "D";  // Type for Deadline task
     }
 
     @Override
-    protected String getType() {
-        return "D";
+    public String getDetails() {
+        return "(by: " + deadlineDate + ")";  // Format the deadline details
+    }
+
+    @Override
+    public String getTaskStorageString() {
+        String doneMark = isDone() ? "X" : " ";
+        return String.format("[D][%s] %s (by: %s)", doneMark, description, deadlineDate);
     }
 }

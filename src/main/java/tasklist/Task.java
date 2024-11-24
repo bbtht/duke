@@ -2,7 +2,9 @@ package tasklist;
 
 // Task.java is a generic task type
 
-public class Task {
+import java.util.*;
+
+public abstract class Task {
     // fields to store the task description and its completion status
     protected String description;
     public boolean isDone;
@@ -13,43 +15,49 @@ public class Task {
         this.isDone = false;
     }
 
-    public String getDescription() {
-        return this.description;
-    }
-
-    public boolean isDone() {
-        return this.isDone;
-    }
-
     public static Task parse(String line) {
+        System.out.println("Parsing line: " + line);  // Debug print for the raw line
+
         if (line.startsWith("[T]")) {
-            // Extract description and completion status
-            boolean isDone = line.charAt(3) == 'X';
-            String description = line.substring(6);
+            boolean isDone = line.charAt(4) == 'X';  // Check for 'X'
+            String description = line.substring(7).trim();  // Adjust index to capture full description
+            System.out.println("Description: " + description);  // Debug print for description
             Todo todo = new Todo(description);
             if (isDone) {
                 todo.markAsDone();
             }
             return todo;
         } else if (line.startsWith("[D]")) {
-            // Extract description, due date, and completion status
-            boolean isDone = line.charAt(3) == 'X';
-            String[] parts = line.substring(6).split(" \\(by: ");
-            String description = parts[0];
-            String by = parts[1].substring(0, parts[1].length() - 1);
-            Deadline deadline = new Deadline(description, by);
+            boolean isDone = line.charAt(4) == 'X';
+            String[] parts = line.substring(7).split(" \\(by: ");  // Adjust index to capture full description
+            String description = parts[0].trim();
+            String deadlineDate = parts[1].substring(0, parts[1].length() - 1).trim();  // Remove closing ')'
+            System.out.println("Description: " + description);  // Debug print for description
+            System.out.println("Deadline Date: " + deadlineDate);  // Debug print for deadline date
+            Deadline deadline = new Deadline(description, deadlineDate);
             if (isDone) {
                 deadline.markAsDone();
             }
             return deadline;
         } else if (line.startsWith("[E]")) {
-            // Extract description, start time, end time, and completion status
-            boolean isDone = line.charAt(3) == 'X';
-            String[] parts = line.substring(6).split(" \\(from: | to: ");
-            String description = parts[0];
-            String from = parts[1];
-            String to = parts[2].substring(0, parts[2].length() - 1);
-            Event event = new Event(description, from, to);
+            boolean isDone = line.charAt(4) == 'X';
+            // Split the line into parts based on the "from" and "to" keywords
+            String[] parts = line.substring(7).split(" \\(from: | to: ");
+
+            // Debug print for raw parts
+            System.out.println("Raw parts: " + Arrays.toString(parts));
+
+            // Extract the description, start, and end times
+            String description = parts[0].trim();
+            String start = parts[1].trim().replace(",", ""); // Remove any trailing commas
+            String end = parts[2].substring(0, parts[2].length() - 1).trim().replace(",", ""); // Remove any trailing commas
+
+            // Debug prints
+            System.out.println("Description: " + description);  // Debug print for description
+            System.out.println("Event Start: " + start);  // Debug print for event start
+            System.out.println("Event End: " + end);  // Debug print for event end
+
+            Event event = new Event(description, start, end);
             if (isDone) {
                 event.markAsDone();
             }
@@ -58,13 +66,17 @@ public class Task {
         throw new IllegalArgumentException("Unknown task format: " + line);
     }
 
+    public String getDescription() {
+        return this.description;
+    }
+
+    public boolean isDone() {
+        return this.isDone;
+    }
+
     // returns status "X" if task is done, and a blank space if task not done
     public String getStatusIcon() {
-        if (isDone) {
-            return "X";
-        } else {
-            return " ";
-        }
+        return isDone ? "X" : " ";
     }
 
     // marks the task as done by setting isDone to true
@@ -81,12 +93,15 @@ public class Task {
         return description;
     }
 
-    @Override
-    public String toString() {
-        return "[" + getType() + "] [" + (isDone ? "X" : " ") + "] " + description;
+    public String getType() { // Abstract method to get the task type
+        return null;
     }
 
-    protected String getType() {
-        return null;
+    public abstract String getDetails(); // Abstract method to get task-specific detail
+
+    @Override
+    public String toString() {
+        String doneMark = isDone ? "X" : " ";
+        return String.format("[%s][%s] %s %s", getType(), doneMark, getDescription(), getDetails()).trim();
     }
 }

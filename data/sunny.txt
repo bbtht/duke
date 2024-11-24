@@ -1,4 +1,5 @@
-[T][ ]  Buy groceries
-[D][ ]  Submit report (by: 2024-11-11)
-[E][ ]  Meeting (from: Mon 2pm,, to: Mon 3pm)
-[T][ ] Shopping
+[E][X] Meeting (from: Mon 2pm, to: Mon 3pm)
+[D][X] Submit report (by: 2024-11-11)
+[T][ ] Buy groceries
+[T][X] Shopping
+[E][ ] Project Meeting (from: 28th April, to: 19th May)

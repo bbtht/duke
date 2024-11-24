@@ -95,10 +95,11 @@ public class Sunny {
 
         StringBuilder taskListString = new StringBuilder("Here are the tasks in your list:\n");
         for (int i = 0; i < taskList.getTasks().size(); i++) {
-            taskListString.append(" ").append(i + 1).append(". ").append(taskList.getTasks().get(i)).append("\n");
+            taskListString.append(i + 1).append(". ").append(taskList.getTasks().get(i)).append("\n");
         }
         printMessage(taskListString.toString());
     }
+
 
     private static void addTask(String input) {
         String[] taskParts = input.split(" ", 2);
@@ -222,7 +223,14 @@ public class Sunny {
 
     private static void saveTasks() {
         try {
-            taskList.saveTasksToFile();
+            printMessage("Starting to save tasks...");
+            if (taskList.getTasks().isEmpty()) {
+                printMessage("No tasks to save.");
+            } else {
+                printMessage("Saving " + taskList.getTasks().size() + " tasks...");
+            }
+            taskList.saveTasksToFile("data/sunny.txt");  // Ensure the path is correct
+            printMessage("Tasks successfully saved to file.");
         } catch (Exception e) {
             printMessage("Error saving tasks: " + e.getMessage());
         }

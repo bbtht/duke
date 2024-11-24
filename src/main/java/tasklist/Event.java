@@ -11,20 +11,27 @@ public class Event extends Task {
     }
 
     public String getEventStart() {
-        return eventStart;
+        return this.eventStart;
     }
 
     public String getEventEnd() {
-        return eventEnd;
+        return this.eventEnd;
     }
 
     @Override
-    public String toString() {
-        return "[E][" + (isDone ? "X" : " ") + "] " + description + " (from: " + eventStart + ", to: " + eventEnd + ")";
+    public String getType() {
+        return "E";  // Type for Event task
     }
 
     @Override
-    protected String getType() {
-        return "E";
+    public String getDetails() {
+        return String.format("(from: %s, to: %s)", eventStart, eventEnd);
     }
+
+    @Override
+    public String getTaskStorageString() {
+        String doneMark = isDone() ? "X" : " ";
+        return String.format("[E][%s] %s (from: %s, to: %s)", doneMark, description, eventStart, eventEnd);
+    }
+
 }
