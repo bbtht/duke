@@ -1,1 +1,3 @@
-[D][ ] finish homework (by: 2024-12-01 15:00)
+[D][X] finish homework (by: 2024-12-01 15:00)
+[T][ ] Buy groceries
+[E][ ] Meeting (from: Mon 2pm, to: Mon 3pm)

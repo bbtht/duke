@@ -39,4 +39,19 @@ public class Event extends Task {
         return String.format("[E][%s] %s (from: %s, to: %s)", doneMark, description, eventStart, eventEnd);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        if (!super.equals(obj)) return false;  // Compare base Task properties
+
+        Event event = (Event) obj;
+        return eventStart.equals(event.eventStart) && eventEnd.equals(event.eventEnd);
+    }
+
+    @Override
+    public int hashCode() {
+        return description.hashCode() + eventStart.hashCode() + eventEnd.hashCode();
+    }
+
 }

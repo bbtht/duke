@@ -140,4 +140,18 @@ public abstract class Task {
 
     // returns the type of the task, to be defined in subclasses
     public abstract String getType();
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        Task task = (Task) obj;
+        return description.equals(task.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return description.hashCode();
+    }
 }

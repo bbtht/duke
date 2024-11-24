@@ -18,16 +18,33 @@ public class TaskList {
     // this creates a new task list. (starts empty)
     public TaskList() {
         this.taskLists = new ArrayList<>();
+        this.ui = new Ui();
     }
 
     // this is a constructor for loading tasks from a file at the specified path
     public TaskList(String filePath) {
         this.taskLists = new ArrayList<>();
+        this.ui = new Ui();
         loadTasksFromFile(filePath);
     }
 
-    public void addTask(Task task) {
-        taskLists.add(task);
+    public boolean addTask(Task task) {
+        if (detectDuplicates(task)) {
+            ui.displayErrorMessage("This task is already in your task list. Task not added. ❌");
+            return false;  // Do not add task if it's a duplicate
+        } else {
+            taskLists.add(task);
+            return true;  // Task added successfully
+        }
+    }
+
+    private boolean detectDuplicates(Task task) {
+        for (Task existingTask : taskLists) {
+            if (existingTask.equals(task)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // removes a task at a specific index from the list

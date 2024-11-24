@@ -37,4 +37,19 @@ public class Deadline extends Task {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return String.format("[D][%s] %s (by: %s)", getStatusIcon(), description, deadlineDate.format(formatter));
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        if (!super.equals(obj)) return false;
+
+        Deadline deadline = (Deadline) obj;
+        return deadlineDate.equals(deadline.deadlineDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return description.hashCode() + deadlineDate.hashCode();
+    }
 }

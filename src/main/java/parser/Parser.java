@@ -82,8 +82,10 @@ public class Parser {
             return;
         }
         Todo todo = new Todo(taskParts[1].trim());
-        taskList.addTask(todo);
-        ui.displaySuccessMessage("added a new Todo: ✅\n Todo Task: " + todo + "\n" + ui.displayTaskCount(taskList.getTasks().size()));
+        boolean isAdded = taskList.addTask(todo);
+        if (isAdded) {
+            ui.displaySuccessMessage("added a new Todo: ✅\n Todo Task: " + todo + "\n" + ui.displayTaskCount(taskList.getTasks().size()));
+        }
     }
 
     private void addDeadlineTask(String[] taskParts) {
@@ -106,8 +108,10 @@ public class Parser {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDateTime deadlineDateTime = LocalDateTime.parse(dateTimeString, formatter);
             Deadline deadline = new Deadline(description, deadlineDateTime);
-            taskList.addTask(deadline);
-            ui.displaySuccessMessage("added a new Deadline: ✅\n Deadline Task: " + deadline + "\n" + ui.displayTaskCount(taskList.getTasks().size()));
+            boolean isAdded = taskList.addTask(deadline);
+            if (isAdded) {
+                ui.displaySuccessMessage("added a new Deadline: ✅\n Deadline Task: " + deadline + "\n" + ui.displayTaskCount(taskList.getTasks().size()));
+            }
         } catch (DateTimeParseException e) {
             ui.displayErrorMessage("Invalid date and time format! \uD83D\uDCC5 \uD83D\uDD70\uFE0F Please use 'yyyy-MM-dd HH:mm', e.g., '/by 2024-12-01 15:00'.");
         }
@@ -127,8 +131,10 @@ public class Parser {
         }
 
         Event event = new Event(eventParts[0].trim(), eventParts[1].trim(), eventParts[2].trim());
-        taskList.addTask(event);
-        ui.displaySuccessMessage("added an Event: ✅\n Event Task: " + event + "\n" + ui.displayTaskCount(taskList.getTasks().size()));
+        boolean isAdded = taskList.addTask(event);
+        if (isAdded) {
+            ui.displaySuccessMessage("added an Event: ✅\n Event Task: " + event + "\n" + ui.displayTaskCount(taskList.getTasks().size()));
+        }
     }
 
     private void updateTaskStatus(String input, boolean markAsDone) {
