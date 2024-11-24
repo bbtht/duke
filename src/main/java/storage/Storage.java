@@ -67,7 +67,7 @@ public class Storage {
                 tasks.add(task);
             }
         } catch (FileNotFoundException e) {
-            System.out.println("No existing tasks found, starting with an empty task list.");
+            System.out.println("No existing tasks found, starting with an empty task list." + "\nYou can input 'help' to view the full list of available commands!");
         } catch (IOException e) {
             throw new IOException("Error reading tasks from file.", e);
         }

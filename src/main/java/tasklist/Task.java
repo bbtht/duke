@@ -16,12 +16,12 @@ public abstract class Task {
     }
 
     public static Task parse(String line) {
-        System.out.println("Parsing line: " + line);  // Debug print for the raw line
+        // System.out.println("Parsing line: " + line);
 
         if (line.startsWith("[T]")) {
             boolean isDone = line.charAt(4) == 'X';  // Check for 'X'
             String description = line.substring(7).trim();  // Adjust index to capture full description
-            System.out.println("Description: " + description);  // Debug print for description
+            // System.out.println("Description: " + description);  // Debug print for description
             Todo todo = new Todo(description);
             if (isDone) {
                 todo.markAsDone();
@@ -32,8 +32,8 @@ public abstract class Task {
             String[] parts = line.substring(7).split(" \\(by: ");  // Adjust index to capture full description
             String description = parts[0].trim();
             String deadlineDate = parts[1].substring(0, parts[1].length() - 1).trim();  // Remove closing ')'
-            System.out.println("Description: " + description);  // Debug print for description
-            System.out.println("Deadline Date: " + deadlineDate);  // Debug print for deadline date
+            // System.out.println("Description: " + description);  // Debug print for description
+            // System.out.println("Deadline Date: " + deadlineDate);  // Debug print for deadline date
             Deadline deadline = new Deadline(description, deadlineDate);
             if (isDone) {
                 deadline.markAsDone();
@@ -44,8 +44,7 @@ public abstract class Task {
             // Split the line into parts based on the "from" and "to" keywords
             String[] parts = line.substring(7).split(" \\(from: | to: ");
 
-            // Debug print for raw parts
-            System.out.println("Raw parts: " + Arrays.toString(parts));
+            // System.out.println("Raw parts: " + Arrays.toString(parts));
 
             // Extract the description, start, and end times
             String description = parts[0].trim();
@@ -53,9 +52,9 @@ public abstract class Task {
             String end = parts[2].substring(0, parts[2].length() - 1).trim().replace(",", ""); // Remove any trailing commas
 
             // Debug prints
-            System.out.println("Description: " + description);  // Debug print for description
-            System.out.println("Event Start: " + start);  // Debug print for event start
-            System.out.println("Event End: " + end);  // Debug print for event end
+            // System.out.println("Description: " + description);  // Debug print for description
+            // System.out.println("Event Start: " + start);  // Debug print for event start
+            // System.out.println("Event End: " + end);  // Debug print for event end
 
             Event event = new Event(description, start, end);
             if (isDone) {
