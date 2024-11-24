@@ -7,6 +7,11 @@ public class Todo extends Task {
 
     @Override
     public String toString() {
-        return "[T]" + super.toString();
+        return "[T][" + (isDone ? "X" : " ") + "] " + description;
+    }
+
+    @Override
+    protected String getType() {
+        return "T";
     }
 }

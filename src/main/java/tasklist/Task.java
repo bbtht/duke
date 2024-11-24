@@ -13,6 +13,14 @@ public class Task {
         this.isDone = false;
     }
 
+    public String getDescription() {
+        return this.description;
+    }
+
+    public boolean isDone() {
+        return this.isDone;
+    }
+
     public static Task parse(String line) {
         if (line.startsWith("[T]")) {
             // Extract description and completion status
@@ -75,6 +83,10 @@ public class Task {
 
     @Override
     public String toString() {
-        return "[" + getStatusIcon() + "] " + description;
+        return "[" + getType() + "] [" + (isDone ? "X" : " ") + "] " + description;
+    }
+
+    protected String getType() {
+        return null;
     }
 }

@@ -8,8 +8,17 @@ public class Deadline extends Task {
         this.deadlineDate = date;
     }
 
+    public String getDeadlineDate() {
+        return deadlineDate;
+    }
+
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + deadlineDate + ")";
+        return "[D][" + (isDone ? "X" : " ") + "] " + description + " (by: " + deadlineDate + ")";
+    }
+
+    @Override
+    protected String getType() {
+        return "D";
     }
 }

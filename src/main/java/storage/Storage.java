@@ -9,7 +9,7 @@ public class Storage {
 
     // this is a constructor to initialise the file path, ensuring the file path provided is not null
     public Storage(String filePath) {
-        assert filePath != null : " The filePath cannot be null!";
+        assert filePath != null : "The filePath cannot be null!";
         storageFile = new File(filePath);
     }
 
@@ -37,14 +37,12 @@ public class Storage {
     }
 
     // save the task list to the specified file path, creating the file if necessary
-    public static void save(String filePath, ArrayList<Task> taskList) {
+    public void save(String filePath, ArrayList<Task> taskList) {
+        File targetFile = new File(filePath);
         try {
-            File targetFile = new File(filePath);
-            if (!targetFile.exists()) {
-                targetFile.getParentFile().mkdirs();
-            }
+            ensureFileExists(); // Ensure the directory structure is created for the target file
 
-            try (FileOutputStream writer = new FileOutputStream(filePath)) {
+            try (FileOutputStream writer = new FileOutputStream(targetFile)) {
                 for (Task task : taskList) {
                     writer.write((task.getTaskStorageString() + "\n").getBytes());
                 }
@@ -54,23 +52,18 @@ public class Storage {
         }
     }
 
-    // new saveTasks method to call the existing save method
-    public void saveTasks(ArrayList<Task> tasks) {
-        save(storageFile.getPath(), tasks);
-    }
-
     // new loadTasks() method
     public ArrayList<Task> loadTasks() throws IOException {
         ArrayList<Task> tasks = new ArrayList<>();
 
-        // Ensure the file exists before attempting to load
+        // ensure the file exists before attempting to load
         ensureFileExists();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(storageFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                // Assuming Task has a static method to parse a task from a string
-                Task task = Task.parse(line);
+                // assuming Task has a static method to parse a task from a string
+                Task task = Task.parse(line);  // Assuming `parse` is implemented in Task class
                 tasks.add(task);
             }
         } catch (FileNotFoundException e) {
@@ -78,9 +71,9 @@ public class Storage {
         } catch (IOException e) {
             throw new IOException("Error reading tasks from file.", e);
         }
-
         return tasks;
     }
 }
+
 
 
