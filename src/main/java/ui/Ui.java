@@ -10,25 +10,32 @@ import java.util.*;
 public class Ui {
 
     public void printMessage(String... messages) {
-        printSeparator();
         for (String message : messages) {
             System.out.println(message);
         }
+        printSeparator();
     }
 
     private void printSeparator() {
         System.out.println("____________________________________________________________________________________________________________________________");
     }
 
+    private static final String[] GREETINGS = {
+            "Hey there! Ready to tackle your tasks with Sunny today? 😊",
+            "Hello, Sunny here to help! Let's get started with managing your tasks! 💪",
+            "Hi! Time to get things done with Sunny! 🚀"
+    };
+
     public void displayWelcomeMessage() {
+        printSeparator();
         String logo = "      \\   |   /      \n"
                 + "        .-*-.\n"
                 + "     --  | |  --\n"
                 + "        `-*-'\n"
                 + "      /   |   \\      \n";
-        String welcomeMessage = "Hello! I am Sunny, your happy task manager!\n" +
-                "What can I do for you today?";
-        printMessage(logo + welcomeMessage);
+        Random random = new Random();
+        int index = random.nextInt(GREETINGS.length);
+        printMessage(logo + GREETINGS[index]);
     }
 
     public void displayAvailableCommands() {
@@ -57,12 +64,23 @@ public class Ui {
         System.out.print(prompt);
     }
 
-    public void displayTaskCount(int count) {
-        System.out.println("Sunny noted that you currently have " + count + " tasks in your list.");
+    public String displayTaskCount(int count) {
+        return "Now you have " + count + (count == 1 ? " task" : " tasks") + " in the list.";
     }
 
+    // List of randomized goodbye messages
+    private static final String[] GOODBYE_MESSAGES = {
+            "Goodbye! Sunny says: Stay productive and keep shining! 🌟",
+            "Until next time! Remember: Every day is a chance to be amazing! 💪",
+            "Take care! Sunny will be here when you're ready to conquer more tasks! 🌞",
+            "Bye for now! Keep up the great work! 💼💡",
+            "See you later! Keep chasing your goals, you’re doing great! 🏃‍♂️🏅"
+    };
+
     public void displayGoodbyeMessage() {
-        printMessage("Sunny's heart feels heavy... until we meet again! Goodbye, and take care!");
+        Random random = new Random();
+        int index = random.nextInt(GOODBYE_MESSAGES.length);
+        printMessage(GOODBYE_MESSAGES[index]);
     }
 
 }

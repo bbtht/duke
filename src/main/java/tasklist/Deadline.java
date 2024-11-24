@@ -1,5 +1,10 @@
 package tasklist;
 
+/**
+ * This Deadline.java represents a type of task (Deadline)
+ * Deadline includes the endDate / endTime of a task that requires timing urgency
+ */
+
 public class Deadline extends Task {
     public String deadlineDate;
 

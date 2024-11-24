@@ -4,6 +4,11 @@ import tasklist.*;
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+ * This Storage.java represents the storage, which is used to store our task list in the hard disk
+ * It will load the user input list into data/sunny.txt everytime the user add or remove command
+ */
+
 public class Storage {
     private static File storageFile;
 
@@ -40,7 +45,7 @@ public class Storage {
     public void save(String filePath, ArrayList<Task> taskList) {
         File targetFile = new File(filePath);
         try {
-            ensureFileExists(); // Ensure the directory structure is created for the target file
+            ensureFileExists();
 
             try (FileOutputStream writer = new FileOutputStream(targetFile)) {
                 for (Task task : taskList) {
@@ -48,11 +53,11 @@ public class Storage {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException("An error occurred while accessing the file.", e);
+            throw new RuntimeException("Something went wrong while accessing the file. ❗", e);
         }
     }
 
-    // new loadTasks() method
+    // load tasks from the file and return them as a list
     public ArrayList<Task> loadTasks() throws IOException {
         ArrayList<Task> tasks = new ArrayList<>();
 
@@ -62,14 +67,13 @@ public class Storage {
         try (BufferedReader reader = new BufferedReader(new FileReader(storageFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                // assuming Task has a static method to parse a task from a string
-                Task task = Task.parse(line);  // Assuming `parse` is implemented in Task class
+                Task task = Task.parse(line);
                 tasks.add(task);
             }
         } catch (FileNotFoundException e) {
-            System.out.println("No existing tasks found, starting with an empty task list." + "\nYou can input 'help' to view the full list of available commands!");
+            System.out.println("Looks like you're starting fresh! Let's add some tasks to get started. \uD83D\uDDD2\uFE0F ✍\uFE0F \nYou can type 'help' to see all available commands. \uD83D\uDC81\u200D♀\uFE0F");
         } catch (IOException e) {
-            throw new IOException("Error reading tasks from file.", e);
+            throw new IOException("Error reading tasks from file. ❌", e);
         }
         return tasks;
     }

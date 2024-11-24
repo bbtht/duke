@@ -1,68 +1,96 @@
 package tasklist;
 
-// Task.java is a generic task type
-
 import java.util.*;
 
+/**
+ * This class represents a generic task. Specific task types like Event, Todo, and Deadline
+ * inherit from this class to share common features and behaviors.
+ * A task can either be completed or still pending.
+ */
+
 public abstract class Task {
-    // fields to store the task description and its completion status
     protected String description;
     public boolean isDone;
 
-    // constructor that initialises task with description and sets initial status to "not done"
+    /**
+     * Constructor to create a task with a given description.
+     * By default, a new task is marked as not done.
+     */
     public Task(String desc) {
         this.description = desc;
         this.isDone = false;
     }
 
+    /**
+     * Parses a task string from file storage and creates a corresponding task object.
+     * It identifies whether it's a to do, Deadline, or Event based on the string format.
+     *
+     * @param line the string containing task data
+     * @return the corresponding Task object
+     */
     public static Task parse(String line) {
+        // commenting out the debugging print statements in the parse function below
         // System.out.println("Parsing line: " + line);
-
         if (line.startsWith("[T]")) {
-            boolean isDone = line.charAt(4) == 'X';  // Check for 'X'
-            String description = line.substring(7).trim();  // Adjust index to capture full description
-            // System.out.println("Description: " + description);  // Debug print for description
-            Todo todo = new Todo(description);
-            if (isDone) {
-                todo.markAsDone();
-            }
-            return todo;
+            return parseTodo(line);
         } else if (line.startsWith("[D]")) {
-            boolean isDone = line.charAt(4) == 'X';
-            String[] parts = line.substring(7).split(" \\(by: ");  // Adjust index to capture full description
-            String description = parts[0].trim();
-            String deadlineDate = parts[1].substring(0, parts[1].length() - 1).trim();  // Remove closing ')'
-            // System.out.println("Description: " + description);  // Debug print for description
-            // System.out.println("Deadline Date: " + deadlineDate);  // Debug print for deadline date
-            Deadline deadline = new Deadline(description, deadlineDate);
-            if (isDone) {
-                deadline.markAsDone();
-            }
-            return deadline;
+            return parseDeadline(line);
         } else if (line.startsWith("[E]")) {
-            boolean isDone = line.charAt(4) == 'X';
-            // Split the line into parts based on the "from" and "to" keywords
-            String[] parts = line.substring(7).split(" \\(from: | to: ");
-
-            // System.out.println("Raw parts: " + Arrays.toString(parts));
-
-            // Extract the description, start, and end times
-            String description = parts[0].trim();
-            String start = parts[1].trim().replace(",", ""); // Remove any trailing commas
-            String end = parts[2].substring(0, parts[2].length() - 1).trim().replace(",", ""); // Remove any trailing commas
-
-            // Debug prints
-            // System.out.println("Description: " + description);  // Debug print for description
-            // System.out.println("Event Start: " + start);  // Debug print for event start
-            // System.out.println("Event End: " + end);  // Debug print for event end
-
-            Event event = new Event(description, start, end);
-            if (isDone) {
-                event.markAsDone();
-            }
-            return event;
+            return parseEvent(line);
         }
-        throw new IllegalArgumentException("Unknown task format: " + line);
+        throw new IllegalArgumentException("Unknown task format, please try again ❌: " + line);
+    }
+
+    // parses a To do task from a string
+    private static Todo parseTodo(String line) {
+        boolean isDone = line.charAt(4) == 'X';
+        String description = line.substring(7).trim();
+        // System.out.println("Description: " + description);
+        Todo todo = new Todo(description);
+        if (isDone) {
+            todo.markAsDone();
+        }
+        return todo;
+    }
+
+    // parses a Deadline task from a string
+    private static Deadline parseDeadline(String line) {
+        boolean isDone = line.charAt(4) == 'X';
+        String[] parts = line.substring(7).split(" \\(by: ");
+        String description = parts[0].trim();
+        String deadlineDate = parts[1].substring(0, parts[1].length() - 1).trim();
+        // System.out.println("Description: " + description);
+        // System.out.println("Deadline Date: " + deadlineDate);
+        Deadline deadline = new Deadline(description, deadlineDate);
+        if (isDone) {
+            deadline.markAsDone();
+        }
+        return deadline;
+    }
+
+    // parses an Event task from a string
+    private static Event parseEvent(String line) {
+        boolean isDone = line.charAt(4) == 'X';
+        // this is used to split the line into parts based on the "from" and "to" keywords
+        String[] parts = line.substring(7).split(" \\(from: | to: ");
+
+        // System.out.println("Raw parts: " + Arrays.toString(parts));
+
+        // used to extract the description, start, and end time for events
+        String description = parts[0].trim();
+        String start = parts[1].trim().replace(",", "");
+        // remove any extra commas, faced error for displaying task list when ending the program and starting again
+        String end = parts[2].substring(0, parts[2].length() - 1).trim().replace(",", "");
+
+        // System.out.println("Description: " + description);
+        // System.out.println("Event Start: " + start);
+        // System.out.println("Event End: " + end);
+
+        Event event = new Event(description, start, end);
+        if (isDone) {
+            event.markAsDone();
+        }
+        return event;
     }
 
     public String getDescription() {
@@ -73,34 +101,34 @@ public abstract class Task {
         return this.isDone;
     }
 
-    // returns status "X" if task is done, and a blank space if task not done
+    // returns "X" if task is done, or a blank space if it is not done
     public String getStatusIcon() {
         return isDone ? "X" : " ";
     }
 
-    // marks the task as done by setting isDone to true
     public void markAsDone() {
         this.isDone = true;
     }
 
-    // marks the task as not done by setting isDone to false
     public void markAsNotDone() {
         this.isDone = false;
     }
 
+    // these method can be overridden by subclasses to return specific task details
     public String getTaskStorageString(){
+        // returns only the description when saving to file
         return description;
     }
 
-    public String getType() { // Abstract method to get the task type
-        return null;
-    }
-
-    public abstract String getDetails(); // Abstract method to get task-specific detail
+    public abstract String getDetails();
 
     @Override
     public String toString() {
+        // format task output with type, status, description, and details
         String doneMark = isDone ? "X" : " ";
         return String.format("[%s][%s] %s %s", getType(), doneMark, getDescription(), getDetails()).trim();
     }
+
+    // returns the type of the task, to be defined in subclasses
+    public abstract String getType();
 }

@@ -1,5 +1,10 @@
 package tasklist;
 
+/**
+ * This Event.java represents a type of task (Event)
+ * Event includes start time and end time of an Event
+ */
+
 public class Event extends Task {
     private final String eventStart;
     private final String eventEnd;
@@ -20,7 +25,7 @@ public class Event extends Task {
 
     @Override
     public String getType() {
-        return "E";  // Type for Event task
+        return "E";
     }
 
     @Override

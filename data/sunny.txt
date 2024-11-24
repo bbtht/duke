@@ -1,5 +1,0 @@
-[T][X] Buy groceries
-[D][X] Submit report (by: 2024-11-11)
-[E][ ] Meeting (from: Mon 2pm, to: Mon 3pm)
-[E][ ] Meeting (from: Mon 2pm, to: Mon 3pm)
-[E][ ] Meeting (from: Mon 2pm, to: Mon 3pm)
