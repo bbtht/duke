@@ -1,8 +1,10 @@
 package tasklist;
 
 import java.io.*;
+import java.time.format.*;
 import java.util.ArrayList;
 import ui.Ui;
+import java.time.*;
 
 /**
  * This Tasklist.java class manages a list of tasks. It allows you to add, remove, and mark tasks as done.
@@ -130,15 +132,22 @@ public class TaskList {
 
     // parses a Deadline task from a file line
     private Task parseDeadlineTask(String line) {
-        boolean isDone = line.charAt(4) == 'X';  // this is to check for 'X' for completed tasks
+        boolean isDone = line.charAt(4) == 'X';  // Check for 'X' for completed tasks
         String[] parts = line.substring(8).split(" \\(by: ");
         String description = parts[0].trim();
-        String deadlineDate = parts[1].substring(0, parts[1].length() - 1).trim();  // -1 is used to remove closing ')'
-        Deadline deadline = new Deadline(description, deadlineDate);
-        if (isDone) {
-            deadline.markAsDone();
+        String deadlineDate = parts[1].substring(0, parts[1].length() - 1).trim();  // Remove closing ')'
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime deadline = LocalDateTime.parse(deadlineDate, formatter);
+            Deadline task = new Deadline(description, deadline);
+            if (isDone) {
+                task.markAsDone();
+            }
+            return task;
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format: please try again ❌:" + deadlineDate);
         }
-        return deadline;
     }
 
     // Parses an Event task from a file line

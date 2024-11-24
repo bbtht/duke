@@ -1,6 +1,9 @@
 package tasklist;
 
 import java.util.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 /**
  * This class represents a generic task. Specific task types like Event, Todo, and Deadline
@@ -58,14 +61,20 @@ public abstract class Task {
         boolean isDone = line.charAt(4) == 'X';
         String[] parts = line.substring(7).split(" \\(by: ");
         String description = parts[0].trim();
-        String deadlineDate = parts[1].substring(0, parts[1].length() - 1).trim();
+        String deadlineDateString = parts[1].substring(0, parts[1].length() - 1).trim();
         // System.out.println("Description: " + description);
         // System.out.println("Deadline Date: " + deadlineDate);
-        Deadline deadline = new Deadline(description, deadlineDate);
-        if (isDone) {
-            deadline.markAsDone();
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime parsedDeadlineDate = LocalDateTime.parse(deadlineDateString, formatter);
+            Deadline deadline = new Deadline(description, parsedDeadlineDate);
+            if (isDone) {
+                deadline.markAsDone();
+            }
+            return deadline;
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format in task file: " + deadlineDateString, e);
         }
-        return deadline;
     }
 
     // parses an Event task from a string

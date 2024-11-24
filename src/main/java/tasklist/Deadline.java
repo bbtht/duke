@@ -1,20 +1,22 @@
 package tasklist;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 /**
  * This Deadline.java represents a type of task (Deadline)
  * Deadline includes the endDate / endTime of a task that requires timing urgency
  */
 
 public class Deadline extends Task {
-    public String deadlineDate;
+    private final LocalDateTime deadlineDate;
 
-    public Deadline(String deadlineDescription, String date) {
+    public Deadline(String deadlineDescription, LocalDateTime date) {
         super(deadlineDescription);
         this.deadlineDate = date;
     }
 
-    public String getDeadlineDate() {
-        return this.deadlineDate;
+    public LocalDateTime getDeadlineDate() {
+        return deadlineDate;
     }
 
     @Override
@@ -24,12 +26,15 @@ public class Deadline extends Task {
 
     @Override
     public String getDetails() {
-        return "(by: " + deadlineDate + ")";  // Format the deadline details
+        // format the LocalDateTime into a user-friendly string
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d yyyy, h:mm a");
+        return String.format("(by: %s)", deadlineDate.format(formatter));
     }
 
     @Override
     public String getTaskStorageString() {
-        String doneMark = isDone() ? "X" : " ";
-        return String.format("[D][%s] %s (by: %s)", doneMark, description, deadlineDate);
+        // format the LocalDateTime into a savable string
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return String.format("[D][%s] %s (by: %s)", getStatusIcon(), description, deadlineDate.format(formatter));
     }
 }

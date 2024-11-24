@@ -3,6 +3,8 @@ package parser;
 import tasklist.*;
 import storage.Storage;
 import ui.Ui;
+import java.time.LocalDateTime;
+import java.time.format.*;
 
 /**
  * This Parser.java is the parser which will take the user input,
@@ -92,13 +94,23 @@ public class Parser {
 
         String[] deadlineParts = taskParts[1].split("/by", 2);
         if (deadlineParts.length < 2 || deadlineParts[1].trim().isEmpty()) {
-            ui.displayErrorMessage("Looks like you forgot to mention the due date! Try something like '/by Monday'.");
+            ui.displayErrorMessage("Looks like you forgot to mention the due date! Try something like '/by 2024-12-01 15:00'.");
             return;
         }
 
-        Deadline deadline = new Deadline(deadlineParts[0].trim(), deadlineParts[1].trim());
-        taskList.addTask(deadline);
-        ui.displaySuccessMessage("added a new Deadline: ✅\n Deadline Task: " + deadline + "\n" + ui.displayTaskCount(taskList.getTasks().size()));
+        String description = deadlineParts[0].trim();
+        String dateTimeString = deadlineParts[1].trim();
+
+        try {
+            // define the expected date-time format
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime deadlineDateTime = LocalDateTime.parse(dateTimeString, formatter);
+            Deadline deadline = new Deadline(description, deadlineDateTime);
+            taskList.addTask(deadline);
+            ui.displaySuccessMessage("added a new Deadline: ✅\n Deadline Task: " + deadline + "\n" + ui.displayTaskCount(taskList.getTasks().size()));
+        } catch (DateTimeParseException e) {
+            ui.displayErrorMessage("Invalid date and time format! \uD83D\uDCC5 \uD83D\uDD70\uFE0F Please use 'yyyy-MM-dd HH:mm', e.g., '/by 2024-12-01 15:00'.");
+        }
     }
 
     private void addEventTask(String[] taskParts) {
