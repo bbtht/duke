@@ -5,6 +5,7 @@ import storage.Storage;
 import ui.Ui;
 import java.time.LocalDateTime;
 import java.time.format.*;
+import java.util.ArrayList;
 
 /**
  * This Parser.java is the parser which will take the user input,
@@ -33,6 +34,8 @@ public class Parser {
             updateTaskStatus(input, false);
         } else if (input.startsWith("delete")) {
             deleteTask(input);
+        } else if (input.startsWith("find")) {
+            findTask(input);
         } else {
             addTask(input);
         }
@@ -183,6 +186,31 @@ public class Parser {
             ui.displayErrorMessage("Oops, I couldn’t find that task. Make sure you gave the correct task number. ❗");
         }
         saveTasks();
+    }
+
+    private void findTask(String input) {
+        String[] parts = input.split(" ", 2); // Split only once
+        if (parts.length < 2 || parts[1].trim().isEmpty()) {
+            ui.displayErrorMessage("Hey! You need to provide a keyword to search for tasks. 🔍");
+            return;
+        }
+
+        String keyword = parts[1].trim();
+        ArrayList<Task> matchingTasks = new ArrayList<>();
+        for (Task task : taskList.getTasks()) {
+            if (task.getDescription().toLowerCase().contains(keyword.toLowerCase())) {
+                matchingTasks.add(task);
+            }
+        }
+
+        if (matchingTasks.isEmpty()) {
+            ui.printMessage("No matching tasks found for: \"" + keyword + "\" 😞");
+        } else {
+            ui.printMessage("Here are the matching tasks in your list: \uD83D\uDD0D");
+            for (int i = 0; i < matchingTasks.size(); i++) {
+                ui.printMessage((i + 1) + ". " + matchingTasks.get(i));
+            }
+        }
     }
 
     private void saveTasks() {

@@ -48,7 +48,8 @@ public class Ui {
                 "[unmark <taskNumber>]: mark task number as not done\n" +
                 "[delete <taskNumber>]: delete a task\n" +
                 "[bye/exit/end/quit]: end the session\n" +
-                "[help]: display this help message";
+                "[help]: display this help message\n" +
+                "[find <keyword>]: find keyword related to task ";
         printMessage(availableCommands);
     }
 

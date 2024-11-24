@@ -180,5 +180,25 @@ public class TaskList {
         }
         return event;
     }
+
+    public void findTasks(String keyword) {
+        ArrayList<Task> matchingTasks = new ArrayList<>();
+
+        for (Task task : taskLists) {
+            if (task.getDescription().toLowerCase().contains(keyword.toLowerCase())) {
+                matchingTasks.add(task);
+            }
+        }
+
+        if (matchingTasks.isEmpty()) {
+            ui.displayErrorMessage("No matching tasks found. Try a different keyword. ❓");
+        } else {
+            ui.printMessage("Here are the matching tasks in your list: \uD83D\uDD0D");
+            for (int i = 0; i < matchingTasks.size(); i++) {
+                Task task = matchingTasks.get(i);
+                ui.printMessage((i + 1) + "." + task);
+            }
+        }
+    }
 }
 
